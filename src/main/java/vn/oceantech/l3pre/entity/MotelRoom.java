@@ -46,7 +46,7 @@ public class MotelRoom {
     private SubDistrict subDistrict;  // phường
 
     @Column(name = "address")
-    private String address;
+    private String address; // số nhà, đường
 
     @ManyToOne
     @JoinColumn(name = "type_room_id", referencedColumnName = "id")

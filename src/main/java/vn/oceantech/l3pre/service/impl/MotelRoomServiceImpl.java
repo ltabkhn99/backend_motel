@@ -78,6 +78,20 @@ public class MotelRoomServiceImpl implements MotelRoomService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public List<MotelRoomDto> searchByName(String name) {
+        List<MotelRoom> motelRooms = motelRoomRepo.searchByName(name);
+        return motelRooms.stream().map(motelRoom -> new ModelMapper().
+                map(motelRoom, MotelRoomDto.class)).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<MotelRoomDto> searchByLocation(Integer proId, Integer dtId, Integer subId) {
+        List<MotelRoom> motelRooms = motelRoomRepo.searchByLocation(proId, dtId, subId);
+        return motelRooms.stream().map(motelRoom -> new ModelMapper().
+                map(motelRoom, MotelRoomDto.class)).collect(Collectors.toList());
+    }
+
     private void mapDtoToEntity(MotelRoomDto motelRoomDto, MotelRoom motelRoom) {
         if (motelRoomDto.getAcreage() != null) {
             motelRoom.setAcreage(motelRoomDto.getAcreage());

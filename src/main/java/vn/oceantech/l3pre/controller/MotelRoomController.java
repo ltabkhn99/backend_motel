@@ -29,6 +29,16 @@ public class MotelRoomController {
         return Response.buildResponse(motelRoomService.update(motelRoomDto, image, coverImage));
     }
 
+    @GetMapping("/search-name")
+    public Response<List<MotelRoomDto>> searchByName(String name) {
+        return Response.buildResponse(motelRoomService.searchByName(name));
+    }
+
+    @GetMapping("/search-location")
+    public Response<List<MotelRoomDto>> searchByLocation(Integer proId, Integer dtId, Integer subId) {
+        return Response.buildResponse(motelRoomService.searchByLocation(proId, dtId, subId));
+    }
+
     @DeleteMapping("/{id}")
     public Response<Boolean> deleteById(@PathVariable("id") Integer id) {
         return Response.buildResponse(motelRoomService.deleteById(id));

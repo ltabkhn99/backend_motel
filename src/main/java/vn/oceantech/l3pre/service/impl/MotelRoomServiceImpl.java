@@ -5,6 +5,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import vn.oceantech.l3pre.dto.MotelRoomDto;
+import vn.oceantech.l3pre.email.EmailSender;
 import vn.oceantech.l3pre.entity.*;
 import vn.oceantech.l3pre.exceptions.ErrorMessages;
 import vn.oceantech.l3pre.exceptions.NotFoundException;
@@ -25,6 +26,8 @@ public class MotelRoomServiceImpl implements MotelRoomService {
     private final DistrictRepo districtRepo;
     private final SubDistrictRepo subDistrictRepo;
     private final TypeRoomRepo typeRoomRepo;
+    private final ReceiveNotificationRepo receiveNotificationRepo;
+    private final EmailSender emailSender;
 
     @Override
     public MotelRoomDto create(MotelRoomDto motelRoomDto, MultipartFile image, MultipartFile coverImage) {
@@ -36,7 +39,18 @@ public class MotelRoomServiceImpl implements MotelRoomService {
         }
         motelRoomDto.setPostTime(LocalDateTime.now());
         MotelRoom motelRoom = new ModelMapper().map(motelRoomDto, MotelRoom.class);
-        return new ModelMapper().map(motelRoomRepo.save(motelRoom), MotelRoomDto.class);
+        MotelRoom motelRoomSave = motelRoomRepo.save(motelRoom);
+        List<ReceiveNotification> receiveNotifications = receiveNotificationRepo.getAll();
+        for (ReceiveNotification receiveNotification : receiveNotifications) {
+            if (Objects.equals(receiveNotification.getProvince().getId(), motelRoom.getProvince().getId())
+                    && Objects.equals(receiveNotification.getDistrict().getId(), motelRoom.getDistrict().getId())
+                    && Objects.equals(receiveNotification.getSubDistrict().getId(), motelRoom.getSubDistrict().getId())) {
+                if (image != null && !image.isEmpty()) {
+                    emailSender.sendEmailPostMotel(motelRoomSave, receiveNotification.getUser().getEmail());
+                }
+            }
+        }
+        return new ModelMapper().map(motelRoomSave, MotelRoomDto.class);
     }
 
     @Override
